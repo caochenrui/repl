@@ -118,12 +118,13 @@ def ppTactic (ctx : ContextInfo) (stx : Syntax) : IO Format :=
 
 def tactics (trees : List InfoTree) : M m (List Tactic) :=
   trees.bind InfoTree.tactics |>.mapM
-    fun ⟨ctx, stx, goals, pos, endPos⟩ => do
-      let proofState := some (← ProofSnapshot.create ctx none none goals)
-      let goals := s!"{(← ctx.ppGoals goals)}".trim
+    fun ⟨ctx, ctx2, stx, goalsbefore, goalsafter, pos, endPos⟩ => do
+      let proofState := some (← ProofSnapshot.create ctx none none goalsbefore)
+      let goalsbefore ← Pp.ppGoals ctx2 goalsafter
+      let goalsafter ← Pp.ppGoals ctx2 goalsafter
       let tactic := Format.pretty (← ppTactic ctx stx)
       let proofStateId ← proofState.mapM recordProofSnapshot
-      return Tactic.of goals tactic pos endPos proofStateId
+      return Tactic.of goalsbefore goalsafter tactic pos endPos proofStateId
 
 /-- Record a `ProofSnapshot` and generate a JSON response for it. -/
 def createProofStepReponse (proofState : ProofSnapshot) (old? : Option ProofSnapshot := none) :

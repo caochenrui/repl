@@ -108,16 +108,18 @@ def Sorry.of (goal : String) (pos endPos : Lean.Position) (proofState : Option N
 structure Tactic where
   pos : Pos
   endPos : Pos
-  goals : String
+  goalsbefore : String
+  goalsafter : String
   tactic : String
   proofState : Option Nat
 deriving ToJson, FromJson
 
 /-- Construct the JSON representation of a Lean tactic. -/
-def Tactic.of (goals tactic : String) (pos endPos : Lean.Position) (proofState : Option Nat) : Tactic :=
+def Tactic.of (goalsbefore goalsafter tactic : String) (pos endPos : Lean.Position) (proofState : Option Nat) : Tactic :=
   { pos := ⟨pos.line, pos.column⟩,
     endPos := ⟨endPos.line, endPos.column⟩,
-    goals,
+    goalsbefore,
+    goalsafter,
     tactic,
     proofState }
 

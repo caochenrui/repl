@@ -206,10 +206,10 @@ def sorries (t : InfoTree) : List (ContextInfo × SorryType × Position × Posit
   (t.findSorryTermNodes.map fun ⟨i, ctx⟩ =>
     (ctx, .term i.lctx i.expectedType?, stxRange ctx.fileMap i.stx))
 
-def tactics (t : InfoTree) : List (ContextInfo × Syntax × List MVarId × Position × Position) :=
+def tactics (t : InfoTree) : List (ContextInfo × ContextInfo × Syntax × List MVarId × List MVarId × Position × Position) :=
   (t.findTacticNodes.map fun ⟨i, ctx⟩ =>
     -- HACK: creating a child ngen
-     ({ ctx with mctx := i.mctxBefore, ngen := ctx.ngen.mkChild.1 }, i.stx, i.goalsBefore,
+     ({ ctx with mctx := i.mctxBefore, ngen := ctx.ngen.mkChild.1 }, { ctx with mctx := i.mctxAfter, ngen := ctx.ngen.mkChild.1 }, i.stx, i.goalsBefore, i.goalsAfter,
        stxRange ctx.fileMap i.stx))
 
 
