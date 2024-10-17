@@ -120,7 +120,7 @@ def tactics (trees : List InfoTree) : M m (List Tactic) :=
   trees.bind InfoTree.tactics |>.mapM
     fun ⟨ctx, ctx2, stx, goalsbefore, goalsafter, pos, endPos⟩ => do
       let proofState := some (← ProofSnapshot.create ctx none none goalsbefore)
-      let goalsbefore ← Pp.ppGoals ctx2 goalsafter
+      let goalsbefore ← Pp.ppGoals ctx goalsbefore
       let goalsafter ← Pp.ppGoals ctx2 goalsafter
       let tactic := Format.pretty (← ppTactic ctx stx)
       let proofStateId ← proofState.mapM recordProofSnapshot
