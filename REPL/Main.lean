@@ -331,19 +331,23 @@ def parse (query : String) : IO Input := do
 unsafe def repl : IO Unit :=
   StateT.run' loop {}
 where loop : M IO Unit := do
-  let query ← getLines
-  if query = "" then
-    return ()
-  if query.startsWith "#" || query.startsWith "--" then loop else
-  IO.println <| toString <| ← match ← parse query with
-  | .command r => return toJson (← runCommand r)
-  | .file r => return toJson (← processFile r)
-  | .proofStep r => return toJson (← runProofStep r)
-  | .pickleEnvironment r => return toJson (← pickleCommandSnapshot r)
-  | .unpickleEnvironment r => return toJson (← unpickleCommandSnapshot r)
-  | .pickleProofSnapshot r => return toJson (← pickleProofSnapshot r)
-  | .unpickleProofSnapshot r => return toJson (← unpickleProofSnapshot r)
-  IO.println "" -- easier to parse the output if there are blank lines
+  try
+    let query ← getLines
+    if query = "" then
+      return ()
+    if query.startsWith "#" || query.startsWith "--" then loop else
+    IO.println <| toString <| ← match ← parse query with
+    | .command r => return toJson (← runCommand r)
+    | .file r => return toJson (← processFile r)
+    | .proofStep r => return toJson (← runProofStep r)
+    | .pickleEnvironment r => return toJson (← pickleCommandSnapshot r)
+    | .unpickleEnvironment r => return toJson (← unpickleCommandSnapshot r)
+    | .pickleProofSnapshot r => return toJson (← pickleProofSnapshot r)
+    | .unpickleProofSnapshot r => return toJson (← unpickleProofSnapshot r)
+    IO.println "" -- easier to parse the output if there are blank lines
+  catch e =>
+    IO.eprintln <| "Exception: " ++ toString e
+    IO.println ""
   loop
 
 /-- Main executable function, run as `lake exe repl`. -/
